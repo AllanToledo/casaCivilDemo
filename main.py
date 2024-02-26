@@ -20,7 +20,7 @@ if response.status_code != 200:
     exit()
 
 
-with open("results.json", "w+") as file:
+with open("dados/results.json", "w+") as file:
     file.write(json.dumps(response.json(), indent=3))
 
 conn = psycopg2.connect(database="casacivil",
