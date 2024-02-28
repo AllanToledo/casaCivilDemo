@@ -1,4 +1,4 @@
-CREATE TABLE audit_table (
+CREATE TABLE IF NOT EXISTS audit_table (
     id bigserial primary key,
     username text,
     date_insert timestamp,
@@ -16,19 +16,24 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE TABLE taxa_desocupacao_semana_referente_14_anos_ou_mais(
-    id_sexo integer,
-    id_localidade integer,
-    periodo varchar,
-    taxa float,
-    constraint super_key primary key (id_sexo, id_localidade, periodo)
+--ano;valor;indicador_codigo;local_codigo;data;periodoDaFrequencia;frequencia
+
+DROP TABLE indicadores;
+CREATE TABLE indicadores(
+    ano integer,
+    valor float,
+    indicador_codigo integer,
+    local_codigo integer,
+    periodo_da_frequencia integer,
+    frequencia varchar(20),
+    constraint super_key primary key (indicador_codigo, ano, periodo_da_frequencia, frequencia, local_codigo)
 ) INHERITS (audit_table);
 
 CREATE OR REPLACE TRIGGER audit_table_trigger
-    BEFORE INSERT ON public.taxa_desocupacao_semana_referente_14_anos_ou_mais
+    BEFORE INSERT ON public.indicadores
     FOR EACH ROW EXECUTE PROCEDURE audit_table_function();
 
 
 CREATE USER ibge_api WITH PASSWORD 'IBGE_API_123456';
-GRANT INSERT ON taxa_desocupacao_semana_referente_14_anos_ou_mais TO ibge_api;
+GRANT INSERT ON indicadores TO ibge_api;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ibge_api;
